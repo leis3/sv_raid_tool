@@ -14,7 +14,7 @@ default = ["console_error_panic_hook"]
 wasm-bindgen = "0.2.63"
 console_error_panic_hook = { version = "0.1.6", optional = true }
 wee_alloc = { version = "0.4.5", optional = true }
-sv_raid = { path = "../sv_raid" }
+sv_raid = { git = "https://github.com/leis9631120/sv_raid" }
 serde-wasm-bindgen = "0.4.5"
 yew = { version = "0.20.0", features = ["csr"] }
 log = "0.4.17"
