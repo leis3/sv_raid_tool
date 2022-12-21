@@ -9,15 +9,6 @@ use yew::prelude::*;
 use std::rc::Rc;
 
 
-#[wasm_bindgen]
-pub fn raid_data() {
-    let data = sv_raid::raid("アーマーガア", 6).unwrap();
-    let value: JsValue = serde_wasm_bindgen::to_value(&data).unwrap();
-    web_sys::console::log_1(&value);
-}
-
-
-
 #[derive(Debug, Default)]
 struct App {
     pub data: Rc<Option<Raid>>
@@ -26,7 +17,7 @@ struct App {
 impl Component for App {
     type Message = Option<Raid>;
     type Properties = ();
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self::default()
     }
 

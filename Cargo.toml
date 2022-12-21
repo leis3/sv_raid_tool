@@ -1,6 +1,6 @@
 [package]
 name = "wasm-raid"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["leis <uthmar33@gmail.com>"]
 edition = "2018"
 
@@ -27,8 +27,11 @@ features = [
     "HtmlCollection",
     "HtmlSelectElement",
     "HtmlInputElement",
+    "HtmlLiElement",
     "Element",
-    "InputEvent"
+    "InputEvent",
+    "CompositionEvent",
+    "DataTransfer"
 ]
 
 [dev-dependencies]

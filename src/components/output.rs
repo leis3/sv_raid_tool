@@ -17,15 +17,14 @@ impl Component for Output {
     type Message = ();
     type Properties = OutputProps;
 
-    fn create(ctx: &Context<Self>) -> Self {
+    fn create(_ctx: &Context<Self>) -> Self {
         Self::default()
     }
 
-    fn view(&self, ctx: &Context<Self>) -> Html {
+    fn view(&self, _ctx: &Context<Self>) -> Html {
         if let Some(data) = &self.data {
             html! {
                 <div class="container" style="width:50%;">
-                    // <pre>{format!("{:#?}", data)}</pre>
                     
                     <h2>{&data.name}</h2>
 
