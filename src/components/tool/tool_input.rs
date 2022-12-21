@@ -3,6 +3,12 @@ use yew::{html, Html, Properties};
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlSelectElement, HtmlInputElement};
 use crate::res::{Type, type_color, type_list};
+use once_cell::sync::Lazy;
+
+static POKEMON_LIST: Lazy<Vec<String>> = Lazy::new(|| {
+    let data = include_str!("../../../data/raid_pokemon_list.txt");
+    data.split("\n").filter(|s| !s.is_empty()).map(|s| s.to_string()).collect()
+});
 
 #[derive(Debug, Clone, Default, Properties, PartialEq)]
 pub struct InputProps {
@@ -129,7 +135,12 @@ impl Component for NameInput {
         html! {
             <div style="width: 20em; padding: 10px 20px;">
                 <label class="form-label" for="name">{"名前"}</label>
-                <input type="text" onchange={on_change} class="form-control" value={self.name.clone()} name="name" id="name" />
+                <input type="text" onchange={on_change} list="pklist" class="form-control" value={self.name.clone()} name="name" id="name" autocomplete="off" />
+                <datalist id="pklist">
+                    {POKEMON_LIST.iter().map(|name| html! {
+                        <option value={name.clone()} />
+                    }).collect::<Html>()}
+                </datalist>
             </div>
         }
     }
@@ -235,7 +246,7 @@ impl Component for TypeInput {
                             let color = type_color(type_);
                             html! {
                                 <div class="col" style="margin: 5px;">
-                                    <input type="radio" oninput={on_input.clone()} class="btn-check" name="ty" value={format!("{name}")} id={format!("ty{i}")} autocomplete="off"/>
+                                    <input type="radio" oninput={on_input.clone()} class="btn-check" name="ty" value={format!("{name}")} id={format!("ty{i}")} />
                                     <label class="btn btn-outline-primary" for={format!("ty{i}")} style={format!("width: 80%; background-color:;rgba({:?});", color)}>{name}</label>
                                 </div>
                             }}
