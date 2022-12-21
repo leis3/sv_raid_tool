@@ -27,8 +27,10 @@ features = [
     "HtmlCollection",
     "HtmlSelectElement",
     "HtmlInputElement",
+    "HtmlLiElement",
     "Element",
-    "InputEvent"
+    "InputEvent",
+    "CompositionEvent"
 ]
 
 [dev-dependencies]

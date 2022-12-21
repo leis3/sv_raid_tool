@@ -1,9 +1,11 @@
 use yew::prelude::*;
+use yew::virtual_dom::{VNode, Listener};
 use yew::{html, Html, Properties};
 use wasm_bindgen::JsCast;
-use web_sys::{HtmlSelectElement, HtmlInputElement};
+use web_sys::{HtmlSelectElement, HtmlInputElement, HtmlLiElement, CompositionEvent};
 use crate::res::{Type, type_color, type_list};
 use once_cell::sync::Lazy;
+use std::rc::Rc;
 
 static POKEMON_LIST: Lazy<Vec<String>> = Lazy::new(|| {
     let data = include_str!("../../../data/raid_pokemon_list.txt");
@@ -109,11 +111,64 @@ pub struct NameProps {
 
 #[derive(Debug, Clone, Default)]
 pub struct NameInput {
-    pub name: String
+    pub name: String,
+    filter: String
+}
+
+#[derive(Debug, Clone)]
+pub enum NameMsg {
+    Input(String),
+    Select(String),
+    CompUpdate(String),
+    CompEnd
+}
+
+
+#[derive(Debug, Clone, Default)]
+struct CompositionUpdateListener {
+    pub cb: Callback<String>
+}
+
+impl Listener for CompositionUpdateListener {
+    fn kind(&self) -> yew::virtual_dom::ListenerKind {
+        yew::virtual_dom::ListenerKind::other("compositionupdate".into())
+    }
+
+    fn handle(&self, event: web_sys::Event) {
+        let value = event
+            .dyn_into::<CompositionEvent>().unwrap()
+            .data().unwrap();
+        if wana_kana::is_kana::is_kana(&value) {
+            self.cb.emit(value);
+        }
+    }
+
+    fn passive(&self) -> bool {
+        false
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+struct CompositionEndListener {
+    pub cb: Callback<()>
+}
+
+impl Listener for CompositionEndListener {
+    fn kind(&self) -> yew::virtual_dom::ListenerKind {
+        yew::virtual_dom::ListenerKind::other("compositionend".into())
+    }
+
+    fn handle(&self, event: web_sys::Event) {
+        self.cb.emit(());
+    }
+
+    fn passive(&self) -> bool {
+        false
+    }
 }
 
 impl Component for NameInput {
-    type Message = String;
+    type Message = NameMsg;
     type Properties = NameProps;
 
     fn create(ctx: &Context<Self>) -> Self {
@@ -129,25 +184,81 @@ impl Component for NameInput {
                     .dyn_into::<HtmlInputElement>().unwrap()
                     .value();
                 props.emit(data.clone());
-                link.send_message(data.clone());
+                link.send_message(NameMsg::Input(data.clone()));
             })
         };
+
+        let on_click = {
+            let link = ctx.link().clone();
+            Callback::from(move |e: MouseEvent| {
+                let data = e.target().unwrap()
+                    .dyn_into::<HtmlLiElement>().unwrap()
+                    .inner_text();
+                link.send_message(NameMsg::Select(data));
+            })
+        };
+
+        let on_comp_update = {
+            let link = ctx.link().clone();
+            Callback::from(move |e: String| {
+                link.send_message(NameMsg::CompUpdate(e));
+            })
+        };
+
+        let on_comp_end = {
+            let link = ctx.link().clone();
+            Callback::from(move |_: ()| {
+                link.send_message(NameMsg::CompEnd)
+            })
+        };
+
+        let mut input = html! {
+            <input type="text" onchange={on_change} list="pklist" class="form-control" data-bs-toggle="dropdown"
+                value={self.name.clone()} name="name" id="name" autocomplete="off" />
+        };
+        if let VNode::VTag(tag) = &mut input {
+            tag.add_listener(Rc::new(CompositionUpdateListener {cb: on_comp_update}));
+            tag.add_listener(Rc::new(CompositionEndListener {cb: on_comp_end}));
+        } else { unreachable!() }
         html! {
             <div style="width: 20em; padding: 10px 20px;">
                 <label class="form-label" for="name">{"名前"}</label>
-                <input type="text" onchange={on_change} list="pklist" class="form-control" value={self.name.clone()} name="name" id="name" autocomplete="off" />
-                <datalist id="pklist">
-                    {POKEMON_LIST.iter().map(|name| html! {
-                        <option value={name.clone()} />
-                    }).collect::<Html>()}
-                </datalist>
+                <div>
+                    {input}
+                    <div class="dropdown-menu overflow-auto" aria-labelledby="name" style="max-height:20rem;">
+                        <ul class="text-center p-0">
+                            // ToDo: Define new <PokemonListItem> as Component in order to rerender only this element
+                            {POKEMON_LIST.iter().filter(|s| s.contains(&format!("{}{}", self.name, self.filter))).map(|name| html! {
+                                <li onclick={on_click.clone()} class="dropdown-item text-start">{name.clone()}</li>
+                            }).collect::<Html>()}
+                        </ul>
+                    </div>
+                </div>
             </div>
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-        self.name.push_str(&msg);
-        true
+        match msg {
+            NameMsg::Input(s) => {
+                self.name = s;
+                true
+            },
+            NameMsg::Select(s) => {
+                self.name = s;
+                true
+            },
+            NameMsg::CompUpdate(s) => {
+                self.filter.push_str(&s);
+                false
+            },
+            NameMsg::CompEnd => {
+                let t = self.filter.clone();
+                self.filter.clear();
+                self.name.push_str(&t);
+                false
+            }
+        }
     }
 }
 
