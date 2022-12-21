@@ -78,7 +78,7 @@ impl Component for Input {
             <div style="background-color: rgba(0,0,255,.1);">
                 <NameInput on_input={self.name_cb.clone()} />
                 <StarInput on_input={self.star_cb.clone()} />
-                <TypeInput on_input={self.type_cb.clone()} />
+                // <TypeInput on_input={self.type_cb.clone()} />
                 <SearchInput on_click={self.search_cb.clone()} />
             </div>
         }
