@@ -1,6 +1,7 @@
 mod header;
-mod tool;
+mod input;
+mod output;
 
 pub use header::Header;
-pub use tool::tool_input::Input;
-pub use tool::tool_output::Output;
+pub use input::Input;
+pub use output::Output;
