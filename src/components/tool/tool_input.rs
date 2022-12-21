@@ -351,18 +351,16 @@ impl Component for TypeInput {
             <div style="padding: 20px; width: 70%;">
                 <div>{"テラスタイプ"}</div>
                 <div class="row row-cols-6">
-                    {
-                        type_list().iter().enumerate().map(|(i, name)| {
-                            let type_ = Type::from(name.as_str());
-                            let color = type_color(type_);
-                            html! {
-                                <div class="col" style="margin: 5px;">
-                                    <input type="radio" oninput={on_input.clone()} class="btn-check" name="ty" value={format!("{name}")} id={format!("ty{i}")} />
-                                    <label class="btn btn-outline-primary" for={format!("ty{i}")} style={format!("width: 80%; background-color:;rgba({:?});", color)}>{name}</label>
-                                </div>
-                            }}
-                        ).collect::<Html>()
-                    }
+                    {for type_list().iter().enumerate().map(|(i, name)| {
+                        let type_ = Type::from(name.as_str());
+                        let color = type_color(type_);
+                        html! {
+                            <div class="col" style="margin: 5px;">
+                                <input type="radio" oninput={on_input.clone()} class="btn-check" name="ty" value={format!("{name}")} id={format!("ty{i}")} />
+                                <label class="btn btn-outline-primary" for={format!("ty{i}")} style={format!("width: 80%; background-color:rgba{color:?};")}>{name}</label>
+                            </div>
+                        }}
+                    )}
                 </div>
             </div>
         }
