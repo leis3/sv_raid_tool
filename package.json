@@ -3,7 +3,7 @@
   "collaborators": [
     "leis <uthmar33@gmail.com>"
   ],
-  "version": "0.1.0",
+  "version": "0.2.0",
   "files": [
     "wasm_bg.wasm",
     "wasm.js",
