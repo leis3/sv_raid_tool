@@ -1,3 +1,5 @@
+[![Deploy](https://github.com/leis9631120/sv_raid_tool/actions/workflows/pages.yml/badge.svg?branch=main)](https://github.com/leis9631120/sv_raid_tool/actions/workflows/pages.yml)
+
 # sv_raid_tool
 
 
