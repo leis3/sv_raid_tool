@@ -1,5 +1,5 @@
 [package]
-name = "wasm-raid"
+name = "sv_raid_tool"
 version = "0.2.0"
 authors = ["leis <uthmar33@gmail.com>"]
 edition = "2018"
@@ -9,7 +9,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 wasm-bindgen = "0.2.63"
-sv_raid = { git = "https://github.com/leis9631120/sv_raid" }
+sv_raid = { git = "https://github.com/leis9631120/sv_raid", version = "0.2.0" }
 serde-wasm-bindgen = "0.4.5"
 yew = { version = "0.20.0", features = ["csr"] }
 log = "0.4.17"
