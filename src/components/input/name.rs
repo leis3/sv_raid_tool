@@ -2,7 +2,7 @@ use yew::prelude::*;
 use yew::virtual_dom::{VNode, Listener};
 use yew::{html, Html, Properties};
 use wasm_bindgen::JsCast;
-use web_sys::{HtmlInputElement, HtmlLiElement, CompositionEvent, Event,};
+use web_sys::{HtmlInputElement, HtmlLiElement, Event,};
 use std::rc::Rc;
 use once_cell::sync::Lazy;
 
@@ -19,21 +19,7 @@ pub struct NameProps {
 
 #[derive(Debug, Clone, Default)]
 pub struct NameInput {
-    pub name: String,
-    filter: String
-}
-
-#[derive(Debug, Clone)]
-pub enum NameMsg {
-    Input(String),
-    Select(String),
-    CompUpdate(String),
-    CompEnd
-}
-
-#[derive(Debug, Clone, Default)]
-struct CompositionUpdateListener {
-    pub cb: Callback<String>
+    pub name: String
 }
 
 #[derive(Debug, Clone, Default)]
@@ -41,32 +27,13 @@ struct CompositionEndListener {
     pub cb: Callback<String>
 }
 
-impl Listener for CompositionUpdateListener {
-    fn kind(&self) -> yew::virtual_dom::ListenerKind {
-        yew::virtual_dom::ListenerKind::other("compositionupdate".into())
-    }
-
-    fn handle(&self, event: Event) {
-        let value = event
-            .dyn_into::<CompositionEvent>().unwrap()
-            .data().unwrap();
-        if wana_kana::is_kana::is_kana(&value) {
-            self.cb.emit(value);
-        }
-    }
-
-    fn passive(&self) -> bool {
-        false
-    }
-}
-
 impl Listener for CompositionEndListener {
     fn kind(&self) -> yew::virtual_dom::ListenerKind {
         yew::virtual_dom::ListenerKind::other("compositionend".into())
     }
 
-    fn handle(&self, _event: Event) {
-        let data = _event
+    fn handle(&self, event: Event) {
+        let data = event
             .target().unwrap()
             .dyn_into::<HtmlInputElement>().unwrap()
             .value();
@@ -80,7 +47,7 @@ impl Listener for CompositionEndListener {
 
 
 impl Component for NameInput {
-    type Message = NameMsg;
+    type Message = String;
     type Properties = NameProps;
 
     fn create(_ctx: &Context<Self>) -> Self {
@@ -96,7 +63,7 @@ impl Component for NameInput {
                     .dyn_into::<HtmlInputElement>().unwrap()
                     .value();
                 props.emit(data.clone());
-                link.send_message(NameMsg::Input(data));
+                link.send_message(data);
             })
         };
 
@@ -110,7 +77,7 @@ impl Component for NameInput {
                             .dyn_into::<HtmlInputElement>().unwrap()
                             .value();
                         props.emit(data.clone());
-                        link.send_message(NameMsg::Input(data));
+                        link.send_message(data);
                     },
                     _ => {}
                 }
@@ -125,21 +92,14 @@ impl Component for NameInput {
                     .dyn_into::<HtmlLiElement>().unwrap()
                     .inner_text();
                 props.emit(data.clone());
-                link.send_message(NameMsg::Select(data));
-            })
-        };
-
-        let on_comp_update = {
-            let link = ctx.link().clone();
-            Callback::from(move |e: String| {
-                link.send_message(NameMsg::CompUpdate(e));
+                link.send_message(data);
             })
         };
 
         let on_comp_end = {
             let link = ctx.link().clone();
-            Callback::from(move |_: String| {
-                link.send_message(NameMsg::CompEnd)
+            Callback::from(move |e: String| {
+                link.send_message(e);
             })
         };
 
@@ -148,9 +108,9 @@ impl Component for NameInput {
                 value={self.name.clone()} name="name" id="name" autocomplete="off" />
         };
         if let VNode::VTag(tag) = &mut input {
-            tag.add_listener(Rc::new(CompositionUpdateListener {cb: on_comp_update}));
             tag.add_listener(Rc::new(CompositionEndListener {cb: on_comp_end}));
         } else { unreachable!() }
+        let filter = wana_kana::to_katakana::to_katakana(&self.name);
         html! {
             <div style="width: 20em; padding: 10px 20px;">
                 <label class="form-label" for="name">{"名前"}</label>
@@ -158,7 +118,7 @@ impl Component for NameInput {
                     {input}
                     <div class="dropdown-menu overflow-auto" aria-labelledby="name" style="max-height:20rem;">
                         <ul class="text-center p-0">
-                            {POKEMON_LIST.iter().filter(|s| s.contains(&format!("{}{}", self.name, self.filter))).map(|name| html! {
+                            {POKEMON_LIST.iter().filter(|s| s.contains(&format!("{filter}"))).map(|name| html! {
                                 <li onclick={on_click.clone()} class="dropdown-item text-start">{name.clone()}</li>
                             }).collect::<Html>()}
                         </ul>
@@ -169,31 +129,7 @@ impl Component for NameInput {
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        match msg {
-            NameMsg::Input(s) => {
-                self.name = s;
-                self.filter.clear();
-                true
-            },
-            NameMsg::Select(s) => {
-                self.name = s;
-                self.filter.clear();
-                true
-            },
-            NameMsg::CompUpdate(s) => {
-                // sには現在編集のテキスト全体が入る
-                // ここで再レンダリングするとIMEの編集セッションが維持されないのでfalseを返す
-                self.filter = s;
-                false
-            },
-            NameMsg::CompEnd => {
-                self.filter.clear();
-                false
-            }
-        }
-    }
-
-    fn changed(&mut self, _ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
-        false
+        self.name = msg;
+        true
     }
 }
