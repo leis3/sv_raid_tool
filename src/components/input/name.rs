@@ -102,12 +102,14 @@ impl Component for NameInput {
 
         let on_input = {
             let link = ctx.link().clone();
+            let props = ctx.props().on_input.clone();
             Callback::from(move |e: InputEvent| {
                 match e.input_type().as_str() {
                     "deleteContentForward" | "deleteContentBackward" => {
                         let data = e.target().unwrap()
                             .dyn_into::<HtmlInputElement>().unwrap()
                             .value();
+                        props.emit(data.clone());
                         link.send_message(NameMsg::Input(data));
                     },
                     _ => {}
@@ -117,10 +119,12 @@ impl Component for NameInput {
 
         let on_click = {
             let link = ctx.link().clone();
+            let props = ctx.props().on_input.clone();
             Callback::from(move |e: MouseEvent| {
                 let data = e.target().unwrap()
                     .dyn_into::<HtmlLiElement>().unwrap()
                     .inner_text();
+                props.emit(data.clone());
                 link.send_message(NameMsg::Select(data));
             })
         };

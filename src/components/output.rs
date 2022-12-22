@@ -108,7 +108,9 @@ impl Component for Output {
             }
         }
         else {
-            html! {}
+            html! {
+                "No data"
+            }
         }
     }
 

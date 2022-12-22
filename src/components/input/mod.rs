@@ -5,7 +5,7 @@ mod search;
 
 use name::NameInput;
 use star::StarInput;
-use type_::TypeInput;
+// use type_::TypeInput;
 use search::SearchInput;
 
 use yew::prelude::*;
