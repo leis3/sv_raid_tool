@@ -1,9 +1,13 @@
 {
-  "name": "wasm-raid",
+  "name": "sv_raid_tool",
   "collaborators": [
     "leis <uthmar33@gmail.com>"
   ],
-  "version": "0.2.0",
+  "version": "0.2.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/leis9631120/sv_raid_tool"
+  },
   "files": [
     "wasm_bg.wasm",
     "wasm.js",
