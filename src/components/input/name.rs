@@ -124,7 +124,6 @@ impl Component for NameInput {
                 let data = e.target().unwrap()
                     .dyn_into::<HtmlLiElement>().unwrap()
                     .inner_text();
-                log::info!("send_message: {data:?}");
                 props.emit(data.clone());
                 link.send_message(NameMsg::Select(data));
             })
@@ -177,7 +176,6 @@ impl Component for NameInput {
                 true
             },
             NameMsg::Select(s) => {
-                log::info!("Namemsg::Select({s:?})");
                 self.name = s;
                 self.filter.clear();
                 true
