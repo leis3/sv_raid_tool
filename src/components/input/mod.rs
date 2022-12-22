@@ -44,6 +44,7 @@ impl Component for Input {
         let name_cb = {
             let link = ctx.link().clone();
             Callback::from(move |e: String| {
+                log::info!("Input::name_cb({e:?})");
                 link.send_message(InputMsg::Name(e));
             })
         };
