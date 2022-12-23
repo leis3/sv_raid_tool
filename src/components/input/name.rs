@@ -5,10 +5,15 @@ use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, HtmlLiElement, Event,};
 use std::rc::Rc;
 use once_cell::sync::Lazy;
+use itertools::Itertools;
 
 static POKEMON_LIST: Lazy<Vec<String>> = Lazy::new(|| {
     let data = include_str!("../../../data/raid_pokemon_list.txt");
-    data.split("\n").filter(|s| !s.is_empty()).map(|s| s.to_string()).collect()
+    data.split("\n")
+        .filter(|s| !s.is_empty())
+        .map(|s| s.to_string())
+        .sorted_unstable()
+        .collect()
 });
 
 
@@ -110,7 +115,9 @@ impl Component for NameInput {
         if let VNode::VTag(tag) = &mut input {
             tag.add_listener(Rc::new(CompositionEndListener {cb: on_comp_end}));
         } else { unreachable!() }
+
         let filter = wana_kana::to_katakana::to_katakana(&self.name);
+
         html! {
             <div style="width: 20em; padding: 10px 20px;">
                 <label class="form-label" for="name">{"名前"}</label>
