@@ -23,9 +23,9 @@ impl Component for StarInput {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let link = ctx.link().clone();
-        let props = ctx.props().on_input.clone();
         let onchange = {
+            let link = ctx.link().clone();
+            let props = ctx.props().on_input.clone();
             Callback::from(move |e: Event| {
                 let value = e.target().unwrap()
                     .dyn_into::<HtmlSelectElement>().unwrap()

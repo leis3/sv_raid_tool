@@ -21,10 +21,10 @@ pub struct Input {
     pub name: String,
     pub star: u8,
     pub type_: String,
-    pub name_cb: Callback<String>,
-    pub star_cb: Callback<u8>,
-    pub type_cb: Callback<String>,
-    pub search_cb: Callback<()>
+    name_cb: Callback<String>,
+    star_cb: Callback<u8>,
+    type_cb: Callback<String>,
+    search_cb: Callback<()>
 }
 
 #[derive(Debug, Clone)]
@@ -76,8 +76,8 @@ impl Component for Input {
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
             <div style="background-color: rgba(0,0,255,.1);">
-                <NameInput on_input={self.name_cb.clone()} />
                 <StarInput on_input={self.star_cb.clone()} />
+                <NameInput on_input={self.name_cb.clone()} star={self.star} />
                 // <TypeInput on_input={self.type_cb.clone()} />
                 <SearchInput on_click={self.search_cb.clone()} />
             </div>
