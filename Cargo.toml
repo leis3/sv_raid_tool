@@ -1,6 +1,6 @@
 [package]
 name = "sv_raid_tool"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["leis <uthmar33@gmail.com>"]
 repository = "https://github.com/leis9631120/sv_raid_tool"
 readme = "README.md"
