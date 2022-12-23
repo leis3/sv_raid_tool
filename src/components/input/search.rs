@@ -27,8 +27,10 @@ impl Component for SearchInput {
         };
 
         html! {
-            <div style="padding: 10px 20px;">
-                <button type="button" class="btn btn-info" onclick={on_click}>{"Search"}</button>
+            <div style="padding: 20px 20px;">
+                <button type="button" class="btn btn-info px-4" onclick={on_click}>
+                {"検索"}
+                </button>
             </div>
         }
     }
