@@ -4,6 +4,7 @@ use yew::{html, Html, Properties};
 use wasm_bindgen::JsCast;
 use web_sys::{HtmlInputElement, HtmlLiElement, Event,};
 use std::rc::Rc;
+use std::collections::HashSet;
 use once_cell::sync::Lazy;
 use itertools::Itertools;
 
@@ -19,7 +20,8 @@ static POKEMON_LIST: Lazy<Vec<String>> = Lazy::new(|| {
 
 #[derive(Debug, Clone, PartialEq, Properties)]
 pub struct NameProps {
-    pub on_input: Callback<String>
+    pub on_input: Callback<String>,
+    pub star: u8
 }
 
 #[derive(Debug, Clone, Default)]
@@ -116,7 +118,26 @@ impl Component for NameInput {
             tag.add_listener(Rc::new(CompositionEndListener {cb: on_comp_end}));
         } else { unreachable!() }
 
-        let filter = wana_kana::to_katakana::to_katakana(&self.name);
+        // 名前がname_filterで部分一致するものでフィルタリング
+        let name_filter = wana_kana::to_katakana::to_katakana(&self.name);
+
+        // 選択された難易度に出現するポケモンでフィルタリング
+        let star_filter = sv_raid::filter_by_star(ctx.props().star)
+            .into_iter()
+            .map(|r| r.name)
+            .collect::<HashSet<_>>();
+
+        let filtered = POKEMON_LIST
+            .iter()
+            .filter(|s| s.contains(&name_filter))
+            .cloned()
+            .collect::<HashSet<String>>();
+            
+        let pk_list = filtered
+            .intersection(&star_filter)
+            .sorted_unstable()
+            .cloned()
+            .collect_vec();
 
         html! {
             <div style="width: 20em; padding: 10px 20px;">
@@ -125,7 +146,7 @@ impl Component for NameInput {
                     {input}
                     <div class="dropdown-menu overflow-auto" aria-labelledby="name" style="max-height:20rem;">
                         <ul class="text-center p-0">
-                            {POKEMON_LIST.iter().filter(|s| s.contains(&format!("{filter}"))).map(|name| html! {
+                            {pk_list.iter().map(|name| html! {
                                 <li onclick={on_click.clone()} class="dropdown-item text-start">{name.clone()}</li>
                             }).collect::<Html>()}
                         </ul>
