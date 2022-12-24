@@ -110,13 +110,14 @@ impl Component for NameInput {
             })
         };
 
-        let mut input = html! {
-            <input type="text" onchange={on_change} oninput={on_input} list="pklist" class="form-control" data-bs-toggle="dropdown"
-                value={self.name.clone()} name="name" id="name" autocomplete="off" />
+        let on_reset = {
+            let link = ctx.link().clone();
+            let props = ctx.props().on_input.clone();
+            Callback::from(move |_| {
+                props.emit(String::new());
+                link.send_message(String::new());
+            })
         };
-        if let VNode::VTag(tag) = &mut input {
-            tag.add_listener(Rc::new(CompositionEndListener {cb: on_comp_end}));
-        } else { unreachable!() }
 
         // 名前がname_filterで部分一致するものでフィルタリング
         let name_filter = wana_kana::to_katakana::to_katakana(&self.name);
@@ -139,17 +140,32 @@ impl Component for NameInput {
             .cloned()
             .collect_vec();
 
+        let mut input = html! {
+            <input type="text" onchange={on_change} oninput={on_input} class="form-control" data-bs-toggle="dropdown"
+                value={self.name.clone()} name="name" id="name" autocomplete="off" />
+        };
+        if let VNode::VTag(tag) = &mut input {
+            tag.add_listener(Rc::new(CompositionEndListener {cb: on_comp_end}));
+        } else { unreachable!() }
+
         html! {
             <div style="width: 20em; padding: 10px 20px;">
                 <label class="form-label" for="name">{"名前"}</label>
                 <div>
-                    {input}
-                    <div class="dropdown-menu overflow-auto" aria-labelledby="name" style="max-height:20rem;">
-                        <ul class="text-center p-0">
-                            {pk_list.iter().map(|name| html! {
-                                <li onclick={on_click.clone()} class="dropdown-item text-start">{name.clone()}</li>
-                            }).collect::<Html>()}
-                        </ul>
+                    <div class="input-group">
+                        {input}
+                        <button type="button" class="btn btn-light border-secondary rounded-end" onclick={on_reset}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu overflow-auto" aria-labelledby="name" style="max-height:20rem;">
+                            <ul class="text-center p-0">
+                                {pk_list.iter().map(|name| html! {
+                                    <li onclick={on_click.clone()} class="dropdown-item text-start">{name.clone()}</li>
+                                }).collect::<Html>()}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
