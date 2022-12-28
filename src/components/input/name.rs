@@ -123,7 +123,7 @@ impl Component for NameInput {
         let name_filter = wana_kana::to_katakana::to_katakana(&self.name);
 
         // 選択された難易度に出現するポケモンでフィルタリング
-        let star_filter = sv_raid::filter_by_star(ctx.props().star)
+        let star_filter = sv_raid::raid_filter(None, Some(ctx.props().star))
             .into_iter()
             .map(|r| r.name)
             .collect::<HashSet<_>>();

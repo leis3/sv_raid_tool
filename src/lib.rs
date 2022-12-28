@@ -37,7 +37,7 @@ impl Component for App {
         let on_search = {
             let link = ctx.link().clone();
             Callback::from(move |e: Input| {
-                let result = sv_raid::raid(&e.name, e.star).ok();
+                let result = sv_raid::raid(&e.name, e.star);
                 link.send_message(result);
             })
         };
