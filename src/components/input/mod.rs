@@ -23,7 +23,7 @@ pub struct Input {
     pub type_: String,
     name_cb: Callback<String>,
     star_cb: Callback<u8>,
-    type_cb: Callback<String>,
+    _type_cb: Callback<String>,
     search_cb: Callback<()>
 }
 
@@ -53,7 +53,7 @@ impl Component for Input {
                 link.send_message(InputMsg::Star(e));
             })
         };
-        let type_cb = {
+        let _type_cb = {
             let link = ctx.link().clone();
             Callback::from(move |e: String| {
                 link.send_message(InputMsg::Type(e));
@@ -67,7 +67,7 @@ impl Component for Input {
             })
         };
         Self {
-            name_cb, star_cb, type_cb, search_cb,
+            name_cb, star_cb, _type_cb, search_cb,
             star: 6,
             ..Default::default()
         }
@@ -78,7 +78,7 @@ impl Component for Input {
             <div style="background-color: rgba(0,0,255,.1);">
                 <StarInput on_input={self.star_cb.clone()} />
                 <NameInput on_input={self.name_cb.clone()} star={self.star} />
-                // <TypeInput on_input={self.type_cb.clone()} />
+                // <TypeInput on_input={self._type_cb.clone()} />
                 <SearchInput on_click={self.search_cb.clone()} />
             </div>
         }

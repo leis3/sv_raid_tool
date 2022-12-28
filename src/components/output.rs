@@ -2,6 +2,8 @@ use yew::prelude::*;
 use yew::{html, Html, Properties};
 use sv_raid::Raid;
 use std::rc::Rc;
+use itertools::Itertools;
+use std::cmp::Reverse;
 
 #[derive(Debug, Clone, Default, Properties, PartialEq)]
 pub struct OutputProps {
@@ -93,7 +95,10 @@ impl Component for Output {
                         </tr>
                         </thead>
                         <tbody>
-                            {data.moves.iter().map(|m| html! {
+                            {data.moves.iter().sorted_unstable_by_key(|m| {
+                                // カテゴリ, タイプ, 威力(降順)の順にソート
+                                (m.category.clone() as i32, m.r#type.clone() as i32, Reverse(m.power))
+                            }).map(|m| html! {
                                 <tr>
                                     <td class="text-center">{&m.name}</td>
                                     <td class="text-center">{format!("{}", m.r#type)}</td>
